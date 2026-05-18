@@ -1,0 +1,137 @@
+:root {
+    --primary: #10B981;
+    --primary-dark: #059669;
+    --bg-dark: #0F172A;
+    --text-light: #F8FAFC;
+    --text-muted: #94A3B8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+    padding: 0 10%;
+    position: relative;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(15,23,42,0) 70%);
+    pointer-events: none;
+}
+
+.hero-content {
+    flex: 1;
+    z-index: 10;
+}
+
+.title {
+    font-size: 4.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.05em;
+}
+
+.highlight {
+    color: var(--primary);
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    max-width: 500px;
+    line-height: 1.6;
+}
+
+.cta-button {
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+}
+
+.cta-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.23);
+}
+
+.hero-graphics {
+    flex: 1;
+    position: relative;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+
+.card {
+    position: absolute;
+    width: 200px;
+    height: 280px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-1 {
+    transform: rotateY(-20deg) rotateZ(-10deg) translateX(-60px) translateY(20px);
+    z-index: 1;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(255,255,255,0.05));
+}
+
+.card-2 {
+    transform: rotateY(0deg) translateZ(50px);
+    z-index: 3;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.card-3 {
+    transform: rotateY(20deg) rotateZ(10deg) translateX(60px) translateY(20px);
+    z-index: 2;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(255,255,255,0.05));
+}
+
+.hero-graphics:hover .card-1 {
+    transform: rotateY(-30deg) rotateZ(-15deg) translateX(-100px) translateY(10px);
+}
+.hero-graphics:hover .card-2 {
+    transform: rotateY(0deg) translateZ(80px) scale(1.05);
+}
+.hero-graphics:hover .card-3 {
+    transform: rotateY(30deg) rotateZ(15deg) translateX(100px) translateY(10px);
+}
