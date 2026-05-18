@@ -303,45 +303,65 @@ function setupAuthListeners() {
     };
 
     btnLogin.addEventListener('click', async () => {
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        if(!email || !password) return showError('Preencha os campos!');
-        
-        btnLogin.innerText = 'Entrando...';
-        errorMsg.style.display = 'none';
-        
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        btnLogin.innerText = 'Entrar';
-        
-        if (error) {
-            showError('Erro: ' + error.message);
-        } else {
-            currentUser = data.user;
-            document.getElementById('btn-logout').classList.remove('hidden');
-            hideModal();
-            await loadFromCloud();
+        try {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            if(!email || !password) return showError('Preencha os campos!');
+            
+            btnLogin.innerText = 'Entrando...';
+            errorMsg.style.display = 'none';
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            btnLogin.innerText = 'Entrar';
+            
+            if (error) {
+                showError('Erro: ' + error.message);
+            } else if (data.session) {
+                currentUser = data.user;
+                document.getElementById('btn-logout').classList.remove('hidden');
+                hideModal();
+                await loadFromCloud();
+            } else {
+                showError('Sessão não iniciada. Verifique se precisa confirmar o e-mail.');
+            }
+        } catch (err) {
+            btnLogin.innerText = 'Entrar';
+            showError('Erro inesperado: ' + (err.message || 'Falha de rede'));
+            console.error(err);
         }
     });
 
     btnRegister.addEventListener('click', async () => {
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        if(!email || !password) return showError('Preencha os campos!');
-        
-        btnRegister.innerText = 'Criando...';
-        errorMsg.style.display = 'none';
-        
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        btnRegister.innerText = 'Criar Conta';
-        
-        if (error) {
-            showError('Erro: ' + error.message);
-        } else {
-            currentUser = data.user;
-            document.getElementById('btn-logout').classList.remove('hidden');
-            hideModal();
-            saveToCloud(); // Sincroniza estado local inicial pra nuvem
-            alert('Conta criada com sucesso! Sua coleção agora faz backup na nuvem.');
+        try {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            if(!email || !password) return showError('Preencha os campos!');
+            
+            btnRegister.innerText = 'Criando...';
+            errorMsg.style.display = 'none';
+            
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            btnRegister.innerText = 'Criar Conta';
+            
+            if (error) {
+                showError('Erro: ' + error.message);
+            } else {
+                if (!data.session) {
+                    alert('Conta criada! Mas atenção: O Supabase está exigindo confirmação por e-mail. Vá no seu painel do Supabase > Authentication > Providers > Email e DESATIVE o "Confirm email" para entrar direto.');
+                    showError('Verifique seu e-mail para confirmar a conta, ou desative isso no Supabase.');
+                    return;
+                }
+                
+                currentUser = data.user;
+                document.getElementById('btn-logout').classList.remove('hidden');
+                hideModal();
+                saveToCloud(); // Sincroniza estado local inicial pra nuvem
+                alert('Conta criada com sucesso! Sua coleção agora faz backup na nuvem.');
+            }
+        } catch (err) {
+            btnRegister.innerText = 'Criar Conta';
+            showError('Erro inesperado: ' + (err.message || 'Falha de rede'));
+            console.error(err);
         }
     });
     
