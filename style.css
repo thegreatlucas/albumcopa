@@ -20,6 +20,65 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* Modals & Auth */
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(43, 26, 14, 0.95);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s;
+}
+.modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.modal-content {
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.modal-content input {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(242, 224, 192, 0.1);
+    color: var(--text-light);
+    padding: 0.85rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+}
+.modal-content input:focus {
+    border-color: var(--primary);
+}
+
+.cta-button {
+    background: var(--primary);
+    color: var(--text-light);
+    border: none;
+    padding: 0.85rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+.cta-button:hover { background: var(--primary-dark); }
+.cta-button:active { transform: scale(0.95); }
+.cta-button.outline {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+.cta-button.outline:hover {
+    background: rgba(196, 98, 45, 0.1);
+}
+
 /* Header */
 header {
     background: var(--bg-dark);

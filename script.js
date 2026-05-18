@@ -26,11 +26,31 @@ const ALBUM_STRUCTURE = [
 
 const TOTAL_STICKERS = ALBUM_STRUCTURE.reduce((acc, curr) => acc + curr.count, 0);
 
+// --- SUPABASE CONFIG ---
+const supabaseUrl = 'https://laymvtzfropvfujlkqys.supabase.co';
+const supabaseKey = 'sb_publishable_eaOkxzUYgKPTYdmgKwW9PQ_mb0W08V4';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+let currentUser = null;
+
 let collection = JSON.parse(localStorage.getItem('albumcopa_collection')) || {};
 let currentFilter = 'all';
+let syncTimeout = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Tenta pegar a sessão atual
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+        currentUser = session.user;
+        document.getElementById('btn-logout').classList.remove('hidden');
+        document.getElementById('auth-modal').classList.add('hidden');
+        await loadFromCloud();
+    } else {
+        document.getElementById('auth-modal').classList.remove('hidden');
+    }
+    
     init();
+    setupAuthListeners();
 });
 
 function init() {
@@ -40,6 +60,65 @@ function init() {
     setupTabs();
     setupFilters();
     setupSwapLogic();
+}
+
+async function loadFromCloud() {
+    if (!currentUser) return;
+    try {
+        const { data, error } = await supabase
+            .from('collections')
+            .select('data')
+            .eq('user_id', currentUser.id)
+            .single();
+            
+        if (data && data.data) {
+            if (Object.keys(data.data).length > 0) {
+                collection = data.data;
+                localStorage.setItem('albumcopa_collection', JSON.stringify(collection));
+                renderGrid();
+                updateStats();
+                updateMyCode();
+            }
+        }
+    } catch (err) {
+        console.error("Erro ao puxar dados da nuvem", err);
+    }
+}
+
+async function saveToCloud() {
+    if (!currentUser) return;
+    try {
+        const { error } = await supabase
+            .from('collections')
+            .upsert(
+                { user_id: currentUser.id, data: collection },
+                { onConflict: 'user_id' }
+            );
+            
+        if (error) console.error("Erro ao salvar na nuvem:", error);
+    } catch (err) {
+        console.error("Erro ao sincronizar", err);
+    }
+}
+
+window.updateCollection = function(id, change) {
+    const current = collection[id] || 0;
+    const newCount = Math.max(0, current + change);
+    
+    if (newCount === 0) {
+        delete collection[id];
+    } else {
+        collection[id] = newCount;
+    }
+    
+    localStorage.setItem('albumcopa_collection', JSON.stringify(collection));
+    updateStats();
+    updateMyCode();
+    renderGrid();
+    
+    // Cloud sync (com debounce para não floodar o Supabase de requisições)
+    clearTimeout(syncTimeout);
+    syncTimeout = setTimeout(saveToCloud, 1500);
 }
 
 function renderGrid() {
@@ -97,22 +176,6 @@ function renderGrid() {
     if (fragment.children.length === 0) {
         gridContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Nenhuma figurinha encontrada para este filtro.</p>';
     }
-}
-
-window.updateCollection = function(id, change) {
-    const current = collection[id] || 0;
-    const newCount = Math.max(0, current + change);
-    
-    if (newCount === 0) {
-        delete collection[id];
-    } else {
-        collection[id] = newCount;
-    }
-    
-    localStorage.setItem('albumcopa_collection', JSON.stringify(collection));
-    updateStats();
-    updateMyCode();
-    renderGrid();
 }
 
 function updateStats() {
@@ -224,4 +287,74 @@ function renderSwapList(elementId, list) {
     }
     
     el.innerHTML = list.map(id => `<span class="swap-badge">${id}</span>`).join('');
+}
+
+function setupAuthListeners() {
+    const emailInput = document.getElementById('auth-email');
+    const passwordInput = document.getElementById('auth-password');
+    const btnLogin = document.getElementById('btn-login');
+    const btnRegister = document.getElementById('btn-register');
+    const errorMsg = document.getElementById('auth-error');
+    
+    const hideModal = () => document.getElementById('auth-modal').classList.add('hidden');
+    const showError = (msg) => {
+        errorMsg.innerText = msg;
+        errorMsg.style.display = 'block';
+    };
+
+    btnLogin.addEventListener('click', async () => {
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        if(!email || !password) return showError('Preencha os campos!');
+        
+        btnLogin.innerText = 'Entrando...';
+        errorMsg.style.display = 'none';
+        
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        btnLogin.innerText = 'Entrar';
+        
+        if (error) {
+            showError('Erro: ' + error.message);
+        } else {
+            currentUser = data.user;
+            document.getElementById('btn-logout').classList.remove('hidden');
+            hideModal();
+            await loadFromCloud();
+        }
+    });
+
+    btnRegister.addEventListener('click', async () => {
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        if(!email || !password) return showError('Preencha os campos!');
+        
+        btnRegister.innerText = 'Criando...';
+        errorMsg.style.display = 'none';
+        
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        btnRegister.innerText = 'Criar Conta';
+        
+        if (error) {
+            showError('Erro: ' + error.message);
+        } else {
+            currentUser = data.user;
+            document.getElementById('btn-logout').classList.remove('hidden');
+            hideModal();
+            saveToCloud(); // Sincroniza estado local inicial pra nuvem
+            alert('Conta criada com sucesso! Sua coleção agora faz backup na nuvem.');
+        }
+    });
+    
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        currentUser = null;
+        document.getElementById('btn-logout').classList.add('hidden');
+        document.getElementById('auth-modal').classList.remove('hidden');
+        
+        // Limpa a coleção local ao sair
+        collection = {};
+        localStorage.removeItem('albumcopa_collection');
+        renderGrid();
+        updateStats();
+    });
 }
