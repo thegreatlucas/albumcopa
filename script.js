@@ -29,7 +29,7 @@ const TOTAL_STICKERS = ALBUM_STRUCTURE.reduce((acc, curr) => acc + curr.count, 0
 // --- SUPABASE CONFIG ---
 const supabaseUrl = 'https://laymvtzfropvfujlkqys.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxheW12dHpmcm9wdmZ1amxrcXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMDc0MjMsImV4cCI6MjA5NDY4MzQyM30.P5J2cZHMEgCuwJGxLCUrDNyHB_XWaYwVuQYQaX-VgaM';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 let currentUser = null;
 
 let collection = JSON.parse(localStorage.getItem('albumcopa_collection')) || {};
@@ -38,7 +38,7 @@ let syncTimeout = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Tenta pegar a sessão atual
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     
     if (session) {
         currentUser = session.user;
@@ -65,7 +65,7 @@ function init() {
 async function loadFromCloud() {
     if (!currentUser) return;
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('collections')
             .select('data')
             .eq('user_id', currentUser.id)
@@ -88,7 +88,7 @@ async function loadFromCloud() {
 async function saveToCloud() {
     if (!currentUser) return;
     try {
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('collections')
             .upsert(
                 { user_id: currentUser.id, data: collection },
@@ -311,7 +311,7 @@ function setupAuthListeners() {
             btnLogin.innerText = 'Entrando...';
             errorMsg.style.display = 'none';
             
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             btnLogin.innerText = 'Entrar';
             
             if (error) {
@@ -340,7 +340,7 @@ function setupAuthListeners() {
             btnRegister.innerText = 'Criando...';
             errorMsg.style.display = 'none';
             
-            const { data, error } = await supabase.auth.signUp({ email, password });
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
             btnRegister.innerText = 'Criar Conta';
             
             if (error) {
@@ -366,7 +366,7 @@ function setupAuthListeners() {
     });
     
     document.getElementById('btn-logout').addEventListener('click', async () => {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         currentUser = null;
         document.getElementById('btn-logout').classList.add('hidden');
         document.getElementById('auth-modal').classList.remove('hidden');
