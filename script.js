@@ -201,7 +201,7 @@ function renderGrid() {
     
     gridContainer.appendChild(fragment);
     
-    if (fragment.children.length === 0) {
+    if (gridContainer.children.length === 0) {
         gridContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Nenhuma figurinha encontrada para este filtro.</p>';
     }
 }
