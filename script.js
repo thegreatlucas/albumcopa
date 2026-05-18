@@ -28,7 +28,7 @@ const TOTAL_STICKERS = ALBUM_STRUCTURE.reduce((acc, curr) => acc + curr.count, 0
 
 // --- SUPABASE CONFIG ---
 const supabaseUrl = 'https://laymvtzfropvfujlkqys.supabase.co';
-const supabaseKey = 'sb_publishable_eaOkxzUYgKPTYdmgKwW9PQ_mb0W08V4';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxheW12dHpmcm9wdmZ1amxrcXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMDc0MjMsImV4cCI6MjA5NDY4MzQyM30.P5J2cZHMEgCuwJGxLCUrDNyHB_XWaYwVuQYQaX-VgaM';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 let currentUser = null;
 
