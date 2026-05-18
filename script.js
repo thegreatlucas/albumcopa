@@ -344,25 +344,54 @@ function setupGoTo() {
     const grid = document.getElementById('goto-grid');
     grid.innerHTML = '';
     
-    ALBUM_STRUCTURE.forEach(sec => {
-        const div = document.createElement('div');
-        div.className = 'goto-item';
-        div.innerHTML = `<span class="flag">${sec.flag}</span><span class="prefix">${sec.prefix}</span>`;
-        div.addEventListener('click', () => {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-            const target = document.getElementById('section-' + sec.prefix);
-            if (target) {
-                // Remove filtro caso estivesse ativo
-                if (currentFilter !== 'all') {
-                    document.getElementById('filter-all').click();
+    const groups = [
+        { title: 'Especiais', items: ['00', 'FWC', 'CC'] },
+        { title: 'Grupo A', items: ['MEX', 'RSA', 'KOR', 'CZE'] },
+        { title: 'Grupo B', items: ['CAN', 'BIH', 'QAT', 'SUI'] },
+        { title: 'Grupo C', items: ['BRA', 'MAR', 'HAI', 'SCO'] },
+        { title: 'Grupo D', items: ['USA', 'PAR', 'AUS', 'TUR'] },
+        { title: 'Grupo E', items: ['GER', 'CUW', 'CIV', 'ECU'] },
+        { title: 'Grupo F', items: ['NED', 'JPN', 'SWE', 'TUN'] },
+        { title: 'Grupo G', items: ['BEL', 'EGY', 'IRN', 'NZL'] },
+        { title: 'Grupo H', items: ['ESP', 'CPV', 'KSA', 'URU'] },
+        { title: 'Grupo I', items: ['FRA', 'SEN', 'IRQ', 'NOR'] },
+        { title: 'Grupo J', items: ['ARG', 'ALG', 'AUT', 'JOR'] },
+        { title: 'Grupo K', items: ['POR', 'COD', 'UZB', 'COL'] },
+        { title: 'Grupo L', items: ['ENG', 'CRO', 'GHA', 'PAN'] }
+    ];
+    
+    groups.forEach(group => {
+        const title = document.createElement('h3');
+        title.className = 'goto-group-title';
+        title.innerText = group.title;
+        grid.appendChild(title);
+        
+        const row = document.createElement('div');
+        row.className = `goto-grid-row ${group.title === 'Especiais' ? 'especiais' : ''}`;
+        
+        group.items.forEach(prefix => {
+            const sec = ALBUM_STRUCTURE.find(s => s.prefix === prefix);
+            if (!sec) return;
+            
+            const div = document.createElement('div');
+            div.className = 'goto-item';
+            div.innerHTML = `<span class="flag">${sec.flag}</span><span class="prefix">${sec.prefix}</span>`;
+            div.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+                const target = document.getElementById('section-' + sec.prefix);
+                if (target) {
+                    if (currentFilter !== 'all') {
+                        document.getElementById('filter-all').click();
+                    }
+                    setTimeout(() => {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }, 50);
                 }
-                setTimeout(() => {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }, 50);
-            }
+            });
+            row.appendChild(div);
         });
-        grid.appendChild(div);
+        grid.appendChild(row);
     });
 }
 
