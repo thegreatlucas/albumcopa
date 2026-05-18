@@ -96,6 +96,7 @@ function init() {
     setupTabs();
     setupFilters();
     setupSwapLogic();
+    setupGoTo();
     loadPromotions();
 }
 
@@ -167,6 +168,7 @@ function renderGrid() {
     ALBUM_STRUCTURE.forEach(section => {
         const sectionEl = document.createElement('div');
         sectionEl.className = 'sticker-section';
+        sectionEl.id = 'section-' + section.prefix;
         
         const title = document.createElement('h2');
         title.className = 'section-title';
@@ -324,6 +326,47 @@ function renderSwapList(elementId, list) {
     }
     
     el.innerHTML = list.map(id => `<span class="swap-badge">${id}</span>`).join('');
+}
+
+function setupGoTo() {
+    const modal = document.getElementById('goto-modal');
+    
+    document.getElementById('btn-goto').addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Evita scroll do fundo no mobile
+    });
+    
+    document.getElementById('btn-close-goto').addEventListener('click', () => {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    });
+    
+    const grid = document.getElementById('goto-grid');
+    grid.innerHTML = '';
+    
+    ALBUM_STRUCTURE.forEach(sec => {
+        const div = document.createElement('div');
+        div.className = 'goto-item';
+        div.innerHTML = `<span class="flag">${sec.flag}</span><span class="prefix">${sec.prefix}</span>`;
+        div.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            const target = document.getElementById('section-' + sec.prefix);
+            if (target) {
+                // Remove filtro caso estivesse ativo
+                if (currentFilter !== 'all') {
+                    document.getElementById('filter-all').click();
+                }
+                setTimeout(() => {
+                    const headerOffset = 100;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                }, 100);
+            }
+        });
+        grid.appendChild(div);
+    });
 }
 
 function setupAuthListeners() {
