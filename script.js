@@ -358,11 +358,8 @@ function setupGoTo() {
                     document.getElementById('filter-all').click();
                 }
                 setTimeout(() => {
-                    const headerOffset = 100;
-                    const elementPosition = target.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                }, 100);
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
             }
         });
         grid.appendChild(div);
