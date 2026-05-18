@@ -2,24 +2,70 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Album Copa</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <main class="hero">
-        <div class="hero-content">
-            <h1 class="title">Album<span class="highlight">Copa</span></h1>
-            <p class="subtitle">A sua plataforma interativa para gerenciar coleções.</p>
-            <button class="cta-button">Começar Agora</button>
+    <header>
+        <h1>Album<span class="highlight">Copa</span></h1>
+        <div class="stats">
+            <div class="stat"><span id="stat-total">0</span> <br><small>Completas</small></div>
+            <div class="stat"><span id="stat-missing">670</span> <br><small>Faltam</small></div>
+            <div class="stat"><span id="stat-dupes">0</span> <br><small>Repetidas</small></div>
         </div>
-        <div class="hero-graphics">
-            <div class="card card-1"></div>
-            <div class="card card-2"></div>
-            <div class="card card-3"></div>
-        </div>
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="collection">Minha Coleção</button>
+            <button class="tab-btn" data-tab="swap">Trocar Figurinhas</button>
+        </nav>
+    </header>
+    
+    <main>
+        <section id="collection" class="tab-content active">
+            <div class="filters">
+                <button id="filter-all" class="active">Todas</button>
+                <button id="filter-missing">Faltantes</button>
+                <button id="filter-dupes">Repetidas</button>
+            </div>
+            <div class="stickers-grid" id="stickers-grid">
+                <!-- Javascript will populate -->
+            </div>
+        </section>
+
+        <section id="swap" class="tab-content">
+            <div class="swap-card">
+                <h2>Compartilhar Coleção</h2>
+                <p>Copie seu código e envie para um amigo.</p>
+                <div class="input-group">
+                    <input type="text" id="my-code" readonly>
+                    <button id="btn-copy">Copiar</button>
+                </div>
+            </div>
+            
+            <div class="swap-card">
+                <h2>Comparar com Amigo</h2>
+                <p>Cole o código do seu amigo abaixo para ver as trocas disponíveis.</p>
+                <div class="input-group">
+                    <input type="text" id="friend-code" placeholder="Cole o código aqui...">
+                    <button id="btn-compare">Comparar</button>
+                </div>
+            </div>
+
+            <div id="swap-results" class="hidden swap-results">
+                <div class="swap-section">
+                    <h3>Você pode dar (Você tem repetidas):</h3>
+                    <div id="give-list" class="swap-list"></div>
+                </div>
+                
+                <div class="swap-section">
+                    <h3>Você pode receber (Ele tem repetidas):</h3>
+                    <div id="receive-list" class="swap-list"></div>
+                </div>
+            </div>
+        </section>
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>
