@@ -1,4 +1,31 @@
-const TOTAL_STICKERS = 670;
+const ALBUM_STRUCTURE = [
+    { prefix: 'FWC', name: 'Especiais', count: 29 },
+    { prefix: 'ARG', name: 'Argentina', count: 20 },
+    { prefix: 'AUS', name: 'Austrália', count: 20 },
+    { prefix: 'BEL', name: 'Bélgica', count: 20 },
+    { prefix: 'BRA', name: 'Brasil', count: 20 },
+    { prefix: 'CAN', name: 'Canadá', count: 20 },
+    { prefix: 'CHI', name: 'Chile', count: 20 },
+    { prefix: 'COL', name: 'Colômbia', count: 20 },
+    { prefix: 'CRO', name: 'Croácia', count: 20 },
+    { prefix: 'DEN', name: 'Dinamarca', count: 20 },
+    { prefix: 'ECU', name: 'Equador', count: 20 },
+    { prefix: 'ENG', name: 'Inglaterra', count: 20 },
+    { prefix: 'ESP', name: 'Espanha', count: 20 },
+    { prefix: 'FRA', name: 'França', count: 20 },
+    { prefix: 'GER', name: 'Alemanha', count: 20 },
+    { prefix: 'ITA', name: 'Itália', count: 20 },
+    { prefix: 'JPN', name: 'Japão', count: 20 },
+    { prefix: 'MEX', name: 'México', count: 20 },
+    { prefix: 'NED', name: 'Holanda', count: 20 },
+    { prefix: 'POR', name: 'Portugal', count: 20 },
+    { prefix: 'URU', name: 'Uruguai', count: 20 },
+    { prefix: 'USA', name: 'Estados Unidos', count: 20 },
+    { prefix: 'CC', name: 'Coca-Cola', count: 12 }
+];
+
+const TOTAL_STICKERS = ALBUM_STRUCTURE.reduce((acc, curr) => acc + curr.count, 0);
+
 let collection = JSON.parse(localStorage.getItem('albumcopa_collection')) || {};
 let currentFilter = 'all';
 
@@ -16,32 +43,60 @@ function init() {
 }
 
 function renderGrid() {
-    const grid = document.getElementById('stickers-grid');
-    grid.innerHTML = '';
+    const gridContainer = document.getElementById('stickers-grid-container');
+    gridContainer.innerHTML = '';
     
     const fragment = document.createDocumentFragment();
     
-    for (let i = 1; i <= TOTAL_STICKERS; i++) {
-        const count = collection[i] || 0;
+    ALBUM_STRUCTURE.forEach(section => {
+        const sectionEl = document.createElement('div');
+        sectionEl.className = 'sticker-section';
         
-        if (currentFilter === 'missing' && count > 0) continue;
-        if (currentFilter === 'dupes' && count < 2) continue;
+        const title = document.createElement('h2');
+        title.className = 'section-title';
+        title.innerText = `${section.name} (${section.prefix})`;
+        sectionEl.appendChild(title);
         
-        const card = document.createElement('div');
-        card.className = `sticker-card ${count > 0 ? 'have' : ''} ${count > 1 ? 'dupe' : ''}`;
+        const grid = document.createElement('div');
+        grid.className = 'stickers-grid';
         
-        card.innerHTML = `
-            <span class="number">${i}</span>
-            <div class="card-controls">
-                <button class="btn-minus" onclick="updateCollection(${i}, -1)">-</button>
-                <span class="count">${count}</span>
-                <button class="btn-plus" onclick="updateCollection(${i}, 1)">+</button>
-            </div>
-        `;
-        fragment.appendChild(card);
-    }
+        let hasVisibleStickers = false;
+
+        for (let i = 1; i <= section.count; i++) {
+            const numStr = String(i).padStart(2, '0');
+            const id = `${section.prefix} ${numStr}`;
+            const count = collection[id] || 0;
+            
+            if (currentFilter === 'missing' && count > 0) continue;
+            if (currentFilter === 'dupes' && count < 2) continue;
+            
+            hasVisibleStickers = true;
+            
+            const card = document.createElement('div');
+            card.className = `sticker-card ${count > 0 ? 'have' : ''} ${count > 1 ? 'dupe' : ''}`;
+            
+            card.innerHTML = `
+                <span class="number">${id}</span>
+                <div class="card-controls">
+                    <button class="btn-minus" onclick="updateCollection('${id}', -1)">-</button>
+                    <span class="count">${count}</span>
+                    <button class="btn-plus" onclick="updateCollection('${id}', 1)">+</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+        
+        if (hasVisibleStickers) {
+            sectionEl.appendChild(grid);
+            fragment.appendChild(sectionEl);
+        }
+    });
     
-    grid.appendChild(fragment);
+    gridContainer.appendChild(fragment);
+    
+    if (fragment.children.length === 0) {
+        gridContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Nenhuma figurinha encontrada para este filtro.</p>';
+    }
 }
 
 window.updateCollection = function(id, change) {
@@ -64,11 +119,14 @@ function updateStats() {
     let completed = 0;
     let dupes = 0;
     
-    for (let i = 1; i <= TOTAL_STICKERS; i++) {
-        const count = collection[i] || 0;
-        if (count > 0) completed++;
-        if (count > 1) dupes += (count - 1);
-    }
+    ALBUM_STRUCTURE.forEach(section => {
+        for (let i = 1; i <= section.count; i++) {
+            const id = `${section.prefix} ${String(i).padStart(2, '0')}`;
+            const count = collection[id] || 0;
+            if (count > 0) completed++;
+            if (count > 1) dupes += (count - 1);
+        }
+    });
     
     document.getElementById('stat-total').innerText = completed;
     document.getElementById('stat-missing').innerText = TOTAL_STICKERS - completed;
@@ -119,7 +177,6 @@ function setupSwapLogic() {
             btn.innerText = 'Copiado!';
             setTimeout(() => btn.innerText = originalText, 2000);
         }).catch(err => {
-            // Fallback
             codeInput.select();
             document.execCommand('copy');
             alert('Código copiado!');
@@ -143,20 +200,16 @@ function compareCollections(friendCollection) {
     const giveList = [];
     const receiveList = [];
     
-    for (let i = 1; i <= TOTAL_STICKERS; i++) {
-        const myCount = collection[i] || 0;
-        const friendCount = friendCollection[i] || 0;
-        
-        // Eu posso dar: tenho repetida (>1) E meu amigo precisa (0)
-        if (myCount > 1 && friendCount === 0) {
-            giveList.push(i);
+    ALBUM_STRUCTURE.forEach(section => {
+        for (let i = 1; i <= section.count; i++) {
+            const id = `${section.prefix} ${String(i).padStart(2, '0')}`;
+            const myCount = collection[id] || 0;
+            const friendCount = friendCollection[id] || 0;
+            
+            if (myCount > 1 && friendCount === 0) giveList.push(id);
+            if (myCount === 0 && friendCount > 1) receiveList.push(id);
         }
-        
-        // Eu posso receber: eu preciso (0) E meu amigo tem repetida (>1)
-        if (myCount === 0 && friendCount > 1) {
-            receiveList.push(i);
-        }
-    }
+    });
     
     renderSwapList('give-list', giveList);
     renderSwapList('receive-list', receiveList);
