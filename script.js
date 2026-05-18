@@ -1,27 +1,55 @@
 const ALBUM_STRUCTURE = [
-    { prefix: 'FWC', name: 'Especiais', count: 29 },
-    { prefix: 'ARG', name: 'Argentina', count: 20 },
-    { prefix: 'AUS', name: 'Austrália', count: 20 },
-    { prefix: 'BEL', name: 'Bélgica', count: 20 },
-    { prefix: 'BRA', name: 'Brasil', count: 20 },
-    { prefix: 'CAN', name: 'Canadá', count: 20 },
-    { prefix: 'CHI', name: 'Chile', count: 20 },
-    { prefix: 'COL', name: 'Colômbia', count: 20 },
-    { prefix: 'CRO', name: 'Croácia', count: 20 },
-    { prefix: 'DEN', name: 'Dinamarca', count: 20 },
-    { prefix: 'ECU', name: 'Equador', count: 20 },
-    { prefix: 'ENG', name: 'Inglaterra', count: 20 },
-    { prefix: 'ESP', name: 'Espanha', count: 20 },
-    { prefix: 'FRA', name: 'França', count: 20 },
-    { prefix: 'GER', name: 'Alemanha', count: 20 },
-    { prefix: 'ITA', name: 'Itália', count: 20 },
-    { prefix: 'JPN', name: 'Japão', count: 20 },
-    { prefix: 'MEX', name: 'México', count: 20 },
-    { prefix: 'NED', name: 'Holanda', count: 20 },
-    { prefix: 'POR', name: 'Portugal', count: 20 },
-    { prefix: 'URU', name: 'Uruguai', count: 20 },
-    { prefix: 'USA', name: 'Estados Unidos', count: 20 },
-    { prefix: 'CC', name: 'Coca-Cola', count: 12 }
+    { prefix: '00', name: 'Especial Panini', count: 1, flag: '📘' },
+    { prefix: 'FWC', name: 'Especiais', count: 19, flag: '🏆' },
+    { prefix: 'MEX', name: 'México', count: 20, flag: '🇲🇽' },
+    { prefix: 'RSA', name: 'África do Sul', count: 20, flag: '🇿🇦' },
+    { prefix: 'KOR', name: 'Coreia do Sul', count: 20, flag: '🇰🇷' },
+    { prefix: 'CZE', name: 'República Tcheca', count: 20, flag: '🇨🇿' },
+    { prefix: 'CAN', name: 'Canadá', count: 20, flag: '🇨🇦' },
+    { prefix: 'BIH', name: 'Bósnia e Herzegovina', count: 20, flag: '🇧🇦' },
+    { prefix: 'QAT', name: 'Catar', count: 20, flag: '🇶🇦' },
+    { prefix: 'SUI', name: 'Suíça', count: 20, flag: '🇨🇭' },
+    { prefix: 'BRA', name: 'Brasil', count: 20, flag: '🇧🇷' },
+    { prefix: 'MAR', name: 'Marrocos', count: 20, flag: '🇲🇦' },
+    { prefix: 'HAI', name: 'Haiti', count: 20, flag: '🇭🇹' },
+    { prefix: 'SCO', name: 'Escócia', count: 20, flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿' },
+    { prefix: 'USA', name: 'Estados Unidos', count: 20, flag: '🇺🇸' },
+    { prefix: 'PAR', name: 'Paraguai', count: 20, flag: '🇵🇾' },
+    { prefix: 'AUS', name: 'Austrália', count: 20, flag: '🇦🇺' },
+    { prefix: 'TUR', name: 'Turquia', count: 20, flag: '🇹🇷' },
+    { prefix: 'GER', name: 'Alemanha', count: 20, flag: '🇩🇪' },
+    { prefix: 'CUW', name: 'Curaçao', count: 20, flag: '🇨🇼' },
+    { prefix: 'CIV', name: 'Costa do Marfim', count: 20, flag: '🇨🇮' },
+    { prefix: 'ECU', name: 'Equador', count: 20, flag: '🇪🇨' },
+    { prefix: 'NED', name: 'Holanda', count: 20, flag: '🇳🇱' },
+    { prefix: 'JPN', name: 'Japão', count: 20, flag: '🇯🇵' },
+    { prefix: 'SWE', name: 'Suécia', count: 20, flag: '🇸🇪' },
+    { prefix: 'TUN', name: 'Tunísia', count: 20, flag: '🇹🇳' },
+    { prefix: 'BEL', name: 'Bélgica', count: 20, flag: '🇧🇪' },
+    { prefix: 'EGY', name: 'Egito', count: 20, flag: '🇪🇬' },
+    { prefix: 'IRN', name: 'Irã', count: 20, flag: '🇮🇷' },
+    { prefix: 'NZL', name: 'Nova Zelândia', count: 20, flag: '🇳🇿' },
+    { prefix: 'ESP', name: 'Espanha', count: 20, flag: '🇪🇸' },
+    { prefix: 'CPV', name: 'Cabo Verde', count: 20, flag: '🇨🇻' },
+    { prefix: 'KSA', name: 'Arábia Saudita', count: 20, flag: '🇸🇦' },
+    { prefix: 'URU', name: 'Uruguai', count: 20, flag: '🇺🇾' },
+    { prefix: 'FRA', name: 'França', count: 20, flag: '🇫🇷' },
+    { prefix: 'SEN', name: 'Senegal', count: 20, flag: '🇸🇳' },
+    { prefix: 'IRQ', name: 'Iraque', count: 20, flag: '🇮🇶' },
+    { prefix: 'NOR', name: 'Noruega', count: 20, flag: '🇳🇴' },
+    { prefix: 'ARG', name: 'Argentina', count: 20, flag: '🇦🇷' },
+    { prefix: 'ALG', name: 'Argélia', count: 20, flag: '🇩🇿' },
+    { prefix: 'AUT', name: 'Áustria', count: 20, flag: '🇦🇹' },
+    { prefix: 'JOR', name: 'Jordânia', count: 20, flag: '🇯🇴' },
+    { prefix: 'POR', name: 'Portugal', count: 20, flag: '🇵🇹' },
+    { prefix: 'COD', name: 'RD Congo', count: 20, flag: '🇨🇩' },
+    { prefix: 'UZB', name: 'Uzbequistão', count: 20, flag: '🇺🇿' },
+    { prefix: 'COL', name: 'Colômbia', count: 20, flag: '🇨🇴' },
+    { prefix: 'ENG', name: 'Inglaterra', count: 20, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+    { prefix: 'CRO', name: 'Croácia', count: 20, flag: '🇭🇷' },
+    { prefix: 'GHA', name: 'Gana', count: 20, flag: '🇬🇭' },
+    { prefix: 'PAN', name: 'Panamá', count: 20, flag: '🇵🇦' },
+    { prefix: 'CC', name: 'Coca-Cola', count: 14, flag: '🥤' }
 ];
 
 const TOTAL_STICKERS = ALBUM_STRUCTURE.reduce((acc, curr) => acc + curr.count, 0);
@@ -133,7 +161,7 @@ function renderGrid() {
         
         const title = document.createElement('h2');
         title.className = 'section-title';
-        title.innerText = `${section.name} (${section.prefix})`;
+        title.innerHTML = `<span class="flag">${section.flag}</span> ${section.name} <small>(${section.prefix})</small>`;
         sectionEl.appendChild(title);
         
         const grid = document.createElement('div');
@@ -143,7 +171,7 @@ function renderGrid() {
 
         for (let i = 1; i <= section.count; i++) {
             const numStr = String(i).padStart(2, '0');
-            const id = `${section.prefix} ${numStr}`;
+            const id = section.prefix === '00' ? '00' : `${section.prefix} ${numStr}`;
             const count = collection[id] || 0;
             
             if (currentFilter === 'missing' && count > 0) continue;
@@ -184,7 +212,7 @@ function updateStats() {
     
     ALBUM_STRUCTURE.forEach(section => {
         for (let i = 1; i <= section.count; i++) {
-            const id = `${section.prefix} ${String(i).padStart(2, '0')}`;
+            const id = section.prefix === '00' ? '00' : `${section.prefix} ${String(i).padStart(2, '0')}`;
             const count = collection[id] || 0;
             if (count > 0) completed++;
             if (count > 1) dupes += (count - 1);
@@ -265,7 +293,7 @@ function compareCollections(friendCollection) {
     
     ALBUM_STRUCTURE.forEach(section => {
         for (let i = 1; i <= section.count; i++) {
-            const id = `${section.prefix} ${String(i).padStart(2, '0')}`;
+            const id = section.prefix === '00' ? '00' : `${section.prefix} ${String(i).padStart(2, '0')}`;
             const myCount = collection[id] || 0;
             const friendCount = friendCollection[id] || 0;
             
