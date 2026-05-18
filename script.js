@@ -64,6 +64,14 @@ let collection = JSON.parse(localStorage.getItem('albumcopa_collection')) || {};
 let currentFilter = 'all';
 let syncTimeout = null;
 
+// --- MERCADO LIVRE AFFILIATES ---
+// Substitua os códigos MLB pelos IDs reais dos seus produtos no ML
+const AFFILIATE_PRODUCTS = [
+    { mlb: 'MLB3407981503', affiliateUrl: '', fallbackTitle: 'Álbum Capa Dura + Envelopes' },
+    { mlb: 'MLB3396827495', affiliateUrl: '', fallbackTitle: 'Kit 20 Pacotinhos (100 figurinhas)' },
+    { mlb: 'MLB3123456789', affiliateUrl: '', fallbackTitle: 'Caixa Fechada Figurinhas' }
+];
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Tenta pegar a sessão atual
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -88,6 +96,7 @@ function init() {
     setupTabs();
     setupFilters();
     setupSwapLogic();
+    loadPromotions();
 }
 
 async function loadFromCloud() {
@@ -405,4 +414,51 @@ function setupAuthListeners() {
         renderGrid();
         updateStats();
     });
+}
+
+async function loadPromotions() {
+    const container = document.getElementById('promos-container');
+    if (!container) return;
+
+    try {
+        const ids = AFFILIATE_PRODUCTS.map(p => p.mlb).join(',');
+        const response = await fetch(`https://api.mercadolibre.com/items?ids=${ids}`);
+        const data = await response.json();
+        
+        container.innerHTML = ''; // Limpa os skeletons
+
+        data.forEach((itemRes, index) => {
+            const affiliateConfig = AFFILIATE_PRODUCTS[index];
+            const item = itemRes.body;
+            
+            // Se o produto não for encontrado (ex: MLB falso), ignoramos ou usamos mock visual para o dev ver
+            if (itemRes.code !== 200) {
+                return;
+            }
+
+            const card = document.createElement('a');
+            card.className = 'promo-card';
+            card.href = affiliateConfig.affiliateUrl || item.permalink;
+            card.target = '_blank';
+            
+            const formattedPrice = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price);
+            const imageUrl = item.pictures && item.pictures.length > 0 ? item.pictures[0].url : item.thumbnail;
+
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="${item.title}" class="promo-img">
+                <div class="promo-name">${item.title}</div>
+                <div class="promo-price">${formattedPrice}</div>
+            `;
+            
+            container.appendChild(card);
+        });
+        
+        // Se nenhum produto carregou (ex: IDs todos inválidos), esconde a seção
+        if (container.children.length === 0) {
+            document.querySelector('.promos-section').style.display = 'none';
+        }
+    } catch (e) {
+        console.error("Erro ao carregar promoções", e);
+        document.querySelector('.promos-section').style.display = 'none';
+    }
 }
