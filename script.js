@@ -288,13 +288,35 @@ function setupSwapLogic() {
     document.getElementById('btn-compare').addEventListener('click', () => {
         const friendCode = document.getElementById('friend-code').value.trim();
         if (!friendCode) return;
-        
+
         try {
             const friendCollection = JSON.parse(atob(friendCode));
             compareCollections(friendCollection);
         } catch (e) {
             alert('Código inválido! Peça para seu amigo copiar novamente.');
         }
+    });
+
+    document.getElementById('btn-copy-repeated').addEventListener('click', (e) => {
+        const repeated = [];
+        ALBUM_STRUCTURE.forEach(section => {
+            for (let i = 1; i <= section.count; i++) {
+                const id = section.prefix === '00' ? '00' : `${section.prefix} ${String(i).padStart(2, '0')}`;
+                if ((collection[id] || 0) > 1) repeated.push(id);
+            }
+        });
+        copyTextToClipboard(formatForWhatsApp(repeated), e.currentTarget);
+    });
+
+    document.getElementById('btn-copy-needed').addEventListener('click', (e) => {
+        const needed = [];
+        ALBUM_STRUCTURE.forEach(section => {
+            for (let i = 1; i <= section.count; i++) {
+                const id = section.prefix === '00' ? '00' : `${section.prefix} ${String(i).padStart(2, '0')}`;
+                if ((collection[id] || 0) === 0) needed.push(id);
+            }
+        });
+        copyTextToClipboard(formatForWhatsApp(needed), e.currentTarget);
     });
 }
 
@@ -316,6 +338,48 @@ function compareCollections(friendCollection) {
     renderSwapList('give-list', giveList);
     renderSwapList('receive-list', receiveList);
     document.getElementById('swap-results').classList.remove('hidden');
+}
+
+function formatForWhatsApp(list) {
+    if (list.length === 0) return 'Nenhuma figurinha nesta categoria.';
+
+    const byPrefix = {};
+    list.forEach(id => {
+        const prefix = id === '00' ? '00' : id.split(' ')[0];
+        const num = id === '00' ? '00' : id.split(' ')[1];
+        if (!byPrefix[prefix]) byPrefix[prefix] = [];
+        byPrefix[prefix].push(num);
+    });
+
+    const lines = [];
+    ALBUM_STRUCTURE.forEach(section => {
+        const nums = byPrefix[section.prefix];
+        if (!nums) return;
+        if (section.prefix === '00') {
+            lines.push(`${section.flag} ${section.name}: ${nums.join(' - ')}`);
+        } else {
+            lines.push(`${section.prefix} ${section.flag}: ${nums.join(' - ')}`);
+        }
+    });
+
+    return lines.join('\n');
+}
+
+function copyTextToClipboard(text, btn) {
+    const originalText = btn.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        btn.innerText = '✅ Copiado!';
+        setTimeout(() => btn.innerText = originalText, 2000);
+    }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.innerText = '✅ Copiado!';
+        setTimeout(() => btn.innerText = originalText, 2000);
+    });
 }
 
 function renderSwapList(elementId, list) {
